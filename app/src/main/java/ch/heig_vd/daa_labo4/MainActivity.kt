@@ -14,5 +14,7 @@ class MainActivity : AppCompatActivity() {
         val adapter = RecyclerAdapter()
         recycler.adapter = adapter
         recycler.layoutManager = GridLayoutManager(this, 10000)
+
+        adapter.items = listOf()
     }
 }
