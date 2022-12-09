@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">DAA-labo4</string>
     <string name="it_s_an_image_johnson">It\'s an image, Johnson !</string>
+    <string name="menu_clear_cache">Menu clear cache</string>
 </resources>

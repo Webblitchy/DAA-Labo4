@@ -27,8 +27,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.main_menu_synchronize -> {
-                // TODO: execute when synchronize button pressed
+            R.id.menu_clear_cache -> {
+                // TODO: Launch cache clearing
                 true
             }
             else -> super.onOptionsItemSelected(item)
