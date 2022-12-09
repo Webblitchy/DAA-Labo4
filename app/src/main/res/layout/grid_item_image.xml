@@ -5,6 +5,13 @@
 
     <ImageView
         android:id="@+id/image"
-        android:contentDescription="@string/it_s_an_image_johnson" />
+        android:contentDescription="@string/it_s_an_image_johnson"
+        android:visibility="gone"/>
+
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"/>
 
 </GridLayout>
