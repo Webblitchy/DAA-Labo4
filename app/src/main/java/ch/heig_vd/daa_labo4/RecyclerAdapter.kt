@@ -1,31 +1,64 @@
 package ch.heig_vd.daa_labo4
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.Image
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.IOException
+import java.io.InputStream
+import java.net.URL
 import java.util.*
 import kotlin.math.roundToInt
 
 /*
  * Authors: Eliott Chytil, Maxim Golay & Lucien Perregaux
  */
-class RecyclerAdapter(_items : List<Int> = listOf()) : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
+
+class RecyclerAdapter(_coroutine_scope: LifecycleCoroutineScope, _items : List<Int> = listOf()) : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
+    val coroutine_scope = _coroutine_scope
     var items = listOf<Int>()
 
-        set(value) {
-            val diffCallback = DiffCallback(items, value)
-            val diffItems = DiffUtil.calculateDiff(diffCallback)
-            field = value
-            diffItems.dispatchUpdatesTo(this)
-        }
+    set(value) {
+        val diffCallback = DiffCallback(items, value)
+        val diffItems = DiffUtil.calculateDiff(diffCallback)
+        field = value
+        diffItems.dispatchUpdatesTo(this)
+    }
 
     init {
         items = _items
+    }
+
+    suspend fun downloadImage(id: Int): ByteArray? = withContext(Dispatchers.IO) {
+        try {
+            URL("https://daa.iict.ch/images/${id}.jpg")
+                .readBytes()
+        }
+        catch(e: IOException) {
+            Log.w("", "Exception while downloading image", e)
+            null
+        }
+    }
+
+    suspend fun decodeImage(bytes: ByteArray?): Bitmap? = withContext(Dispatchers.Default) {
+        try {
+            BitmapFactory.decodeByteArray(bytes, 0, bytes?.size ?: 0)
+        } catch (e: IOException) {
+            Log.w("", "Exception while decoding image", e)
+            null
+        }
     }
 
     override fun getItemCount() = items.size
@@ -44,9 +77,14 @@ class RecyclerAdapter(_items : List<Int> = listOf()) : RecyclerView.Adapter<Recy
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-
         fun bind(img_index: Int) {
             // TODO: handle cache
+            coroutine_scope.launch {
+                val bytes = downloadImage(img_index)
+                val bmp = decodeImage(bytes)
+
+                // TODO: display image
+            }
         }
     }
 }

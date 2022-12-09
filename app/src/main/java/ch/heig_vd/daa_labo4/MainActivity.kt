@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -16,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val recycler = findViewById<RecyclerView>(R.id.recycler)
-        val adapter = RecyclerAdapter()
+        val adapter = RecyclerAdapter(lifecycleScope)
         recycler.adapter = adapter
         recycler.layoutManager = GridLayoutManager(this, 3)
 
