@@ -32,7 +32,7 @@ class RecyclerAdapter(_coroutine_scope: LifecycleCoroutineScope) : RecyclerView.
     }
 
     init {
-        items = (1..12).toList()
+        items = (1..10000).toList()
     }
 
     suspend fun downloadImage(id: Int): ByteArray? = withContext(Dispatchers.IO) {
@@ -57,8 +57,9 @@ class RecyclerAdapter(_coroutine_scope: LifecycleCoroutineScope) : RecyclerView.
 
     override fun getItemCount() = items.size
 
+    // Not needed for this lab, we only have one type of view
     override fun getItemViewType(position: Int): Int {
-        return items[position]
+        return 0
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -72,16 +73,20 @@ class RecyclerAdapter(_coroutine_scope: LifecycleCoroutineScope) : RecyclerView.
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val image = view.findViewById<ImageView>(R.id.image)
+        private val progressBar = view.findViewById<ProgressBar>(R.id.progressbar)
 
         fun bind(img_index: Int) {
             // TODO: handle cache
             coroutine_scope.launch {
+                progressBar.visibility = View.VISIBLE
+
                 val bytes = downloadImage(img_index)
                 val bmp = decodeImage(bytes)
 
                 // TODO: display image
                 image.setImageBitmap(bmp)
                 image.visibility = View.VISIBLE
+                progressBar.visibility = View.GONE
             }
         }
     }
