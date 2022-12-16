@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val recycler = findViewById<RecyclerView>(R.id.recycler)
-        val adapter = RecyclerAdapter(lifecycleScope)
+        val adapter = RecyclerAdapter(lifecycleScope, cacheDir)
         recycler.adapter = adapter
         recycler.layoutManager = GridLayoutManager(this, 3)
     }
@@ -30,7 +30,12 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_clear_cache -> {
-                // TODO: Launch cache clearing
+                cacheDir.listFiles()
+                    ?.iterator()
+                    ?.forEach {
+                        it.delete()
+                    }
+
                 true
             }
             else -> super.onOptionsItemSelected(item)

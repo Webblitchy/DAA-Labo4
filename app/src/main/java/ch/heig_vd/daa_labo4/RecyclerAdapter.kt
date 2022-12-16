@@ -2,38 +2,36 @@ package ch.heig_vd.daa_labo4
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.io.IOException
 import java.net.URL
+import java.time.Instant
+import java.util.*
+import kotlin.time.Duration.Companion.seconds
 
 /*
  * Authors: Eliott Chytil, Maxim Golay & Lucien Perregaux
  */
 
-class RecyclerAdapter(_coroutine_scope: LifecycleCoroutineScope) : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
+class RecyclerAdapter(_coroutine_scope: LifecycleCoroutineScope, _cacheDir: File) : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
     val coroutine_scope = _coroutine_scope
-    var items = listOf<Int>()
-
-    set(value) {
-        val diffCallback = DiffCallback(items, value)
-        val diffItems = DiffUtil.calculateDiff(diffCallback)
-        field = value
-        diffItems.dispatchUpdatesTo(this)
-    }
-
-    init {
-        items = (1..10000).toList()
-    }
+    val cacheDir = _cacheDir
+    var items = (1..10000).toList()
 
     suspend fun downloadImage(id: Int): ByteArray? = withContext(Dispatchers.IO) {
         try {
@@ -46,13 +44,29 @@ class RecyclerAdapter(_coroutine_scope: LifecycleCoroutineScope) : RecyclerView.
         }
     }
 
-    suspend fun decodeImage(bytes: ByteArray?): Bitmap? = withContext(Dispatchers.Default) {
+    suspend fun decodeImage(bytes: ByteArray): Bitmap? = withContext(Dispatchers.Default) {
         try {
-            BitmapFactory.decodeByteArray(bytes, 0, bytes?.size ?: 0)
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.size ?: 0)
         } catch (e: IOException) {
             Log.w("", "Exception while decoding image", e)
             null
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun readCache(id: Int): ByteArray? = withContext(Dispatchers.IO) {
+        val file = File(cacheDir, "${id}.bmp")
+        val seconds_elapsed = Instant.now().minusMillis(file.lastModified()).epochSecond
+
+        if (file.exists() && seconds_elapsed < 300)
+            return@withContext file.readBytes()
+        else
+            return@withContext null
+    }
+
+    suspend fun updateCache(id: Int, bytes: ByteArray) = withContext(Dispatchers.IO) {
+        val file = File(cacheDir, "${id}.bmp")
+        file.writeBytes(bytes)
     }
 
     override fun getItemCount() = items.size
@@ -74,16 +88,28 @@ class RecyclerAdapter(_coroutine_scope: LifecycleCoroutineScope) : RecyclerView.
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val image = view.findViewById<ImageView>(R.id.image)
         private val progressBar = view.findViewById<ProgressBar>(R.id.progressbar)
+        private var job: Job? = null
 
+        @RequiresApi(Build.VERSION_CODES.O)
         fun bind(img_index: Int) {
-            // TODO: handle cache
-            coroutine_scope.launch {
-                progressBar.visibility = View.VISIBLE
+            // Reset view status
+            image.visibility = View.GONE
+            progressBar.visibility = View.VISIBLE
 
-                val bytes = downloadImage(img_index)
+            // Stop previous job if still running
+            job?.cancel()
+
+            job = coroutine_scope.launch {
+                var bytes = readCache(img_index)
+                bytes = bytes ?: downloadImage(img_index)
+
+                if (bytes == null) return@launch
+
+                updateCache(img_index, bytes)
                 val bmp = decodeImage(bytes)
 
-                // TODO: display image
+                if (bmp == null) return@launch
+
                 image.setImageBitmap(bmp)
                 image.visibility = View.VISIBLE
                 progressBar.visibility = View.GONE
