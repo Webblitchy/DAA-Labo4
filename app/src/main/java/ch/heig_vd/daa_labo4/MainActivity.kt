@@ -20,8 +20,6 @@ class MainActivity : AppCompatActivity() {
         val adapter = RecyclerAdapter(lifecycleScope)
         recycler.adapter = adapter
         recycler.layoutManager = GridLayoutManager(this, 3)
-
-        adapter.items = listOf()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

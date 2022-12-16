@@ -26,7 +26,7 @@ import kotlin.math.roundToInt
  * Authors: Eliott Chytil, Maxim Golay & Lucien Perregaux
  */
 
-class RecyclerAdapter(_coroutine_scope: LifecycleCoroutineScope, _items : List<Int> = listOf()) : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
+class RecyclerAdapter(_coroutine_scope: LifecycleCoroutineScope) : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
     val coroutine_scope = _coroutine_scope
     var items = listOf<Int>()
 
@@ -38,7 +38,7 @@ class RecyclerAdapter(_coroutine_scope: LifecycleCoroutineScope, _items : List<I
     }
 
     init {
-        items = _items
+        items = (1..12).toList()
     }
 
     suspend fun downloadImage(id: Int): ByteArray? = withContext(Dispatchers.IO) {
@@ -77,6 +77,8 @@ class RecyclerAdapter(_coroutine_scope: LifecycleCoroutineScope, _items : List<I
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private val image = view.findViewById<ImageView>(R.id.image)
+
         fun bind(img_index: Int) {
             // TODO: handle cache
             coroutine_scope.launch {
@@ -84,6 +86,8 @@ class RecyclerAdapter(_coroutine_scope: LifecycleCoroutineScope, _items : List<I
                 val bmp = decodeImage(bytes)
 
                 // TODO: display image
+                image.setImageBitmap(bmp)
+                image.visibility = View.VISIBLE
             }
         }
     }
