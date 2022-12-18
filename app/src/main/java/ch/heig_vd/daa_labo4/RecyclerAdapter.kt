@@ -81,6 +81,7 @@ class RecyclerAdapter(_coroutine_scope: LifecycleCoroutineScope, _cacheDir: File
         return ViewHolder(view)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(items[position])
     }
@@ -118,14 +119,3 @@ class RecyclerAdapter(_coroutine_scope: LifecycleCoroutineScope, _cacheDir: File
     }
 }
 
-// TODO: faire
-class DiffCallback(private val oldList: List<Int>, private val newList: List<Int>) : DiffUtil.Callback() {
-    override fun getOldListSize() = oldList.size
-    override fun getNewListSize() = newList.size
-    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return false
-    }
-    override fun areContentsTheSame(oldItemPosition : Int, newItemPosition : Int): Boolean {
-        return false
-    }
-}
