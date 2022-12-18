@@ -34,7 +34,6 @@ class MainActivity : AppCompatActivity() {
             .setRequiresCharging(false)
             .setRequiresBatteryNotLow(true)
             .setRequiredNetworkType(NetworkType.UNMETERED)
-            .setRequiresDeviceIdle(true)
             .build()
 
         val myPeriodicWorkRequest = PeriodicWorkRequestBuilder<CacheWork>(15, TimeUnit.MINUTES)
