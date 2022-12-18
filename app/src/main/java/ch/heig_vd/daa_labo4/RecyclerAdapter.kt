@@ -102,6 +102,7 @@ class RecyclerAdapter(_coroutine_scope: LifecycleCoroutineScope, _cacheDir: File
                 var bytes = readCache(img_index)
                 bytes = bytes ?: downloadImage(img_index)
 
+                // if download failed return from coroutine
                 if (bytes == null) return@launch
 
                 updateCache(img_index, bytes)

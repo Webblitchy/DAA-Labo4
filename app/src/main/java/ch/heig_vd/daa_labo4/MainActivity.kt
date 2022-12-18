@@ -17,12 +17,13 @@ import java.util.concurrent.TimeUnit
  * Authors: Eliott Chytil, Maxim Golay & Lucien Perregaux
  */
 class MainActivity : AppCompatActivity() {
-    private val workManager = WorkManager.getInstance(applicationContext)
+    private var workManager : WorkManager? = null
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        workManager = WorkManager.getInstance(applicationContext)
 
         val recycler = findViewById<RecyclerView>(R.id.recycler)
         val adapter = RecyclerAdapter(lifecycleScope, cacheDir)
@@ -41,7 +42,7 @@ class MainActivity : AppCompatActivity() {
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL,
                 PeriodicWorkRequest.MIN_BACKOFF_MILLIS, TimeUnit.MILLISECONDS)
             .build()
-        workManager.enqueueUniquePeriodicWork("I like trains", ExistingPeriodicWorkPolicy.KEEP, myPeriodicWorkRequest)
+        workManager?.enqueueUniquePeriodicWork("I like trains", ExistingPeriodicWorkPolicy.KEEP, myPeriodicWorkRequest)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -53,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.menu_clear_cache -> {
                 val myWorkRequest = OneTimeWorkRequestBuilder<CacheWork>().build()
-                workManager.enqueue(myWorkRequest)
+                workManager?.enqueue(myWorkRequest)
 
                 true
             }
