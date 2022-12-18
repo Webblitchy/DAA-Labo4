@@ -11,7 +11,6 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -22,7 +21,6 @@ import java.io.IOException
 import java.net.URL
 import java.time.Instant
 import java.util.*
-import kotlin.time.Duration.Companion.seconds
 
 /*
  * Authors: Eliott Chytil, Maxim Golay & Lucien Perregaux
