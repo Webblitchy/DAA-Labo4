@@ -107,9 +107,7 @@ class RecyclerAdapter(_coroutine_scope: LifecycleCoroutineScope, _cacheDir: File
                 if (bytes == null) return@launch
 
                 updateCache(img_index, bytes)
-                val bmp = decodeImage(bytes)
-
-                if (bmp == null) return@launch
+                val bmp = decodeImage(bytes) ?: return@launch
 
                 image.setImageBitmap(bmp)
                 image.visibility = View.VISIBLE
