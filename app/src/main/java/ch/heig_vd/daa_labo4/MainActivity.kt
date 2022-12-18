@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.*
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 /*
@@ -26,6 +27,7 @@ class MainActivity : AppCompatActivity() {
         workManager = WorkManager.getInstance(applicationContext)
 
         val recycler = findViewById<RecyclerView>(R.id.recycler)
+        CacheWork.cache_dir = cacheDir
         val adapter = RecyclerAdapter(lifecycleScope, cacheDir)
         recycler.adapter = adapter
         recycler.layoutManager = GridLayoutManager(this, 3)
@@ -61,13 +63,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    inner class CacheWork(appContext: Context, workerParams: WorkerParameters) :
+    class CacheWork(appContext: Context, workerParams: WorkerParameters) :
         Worker(appContext, workerParams) {
+        companion object {
+            var cache_dir: File? = null
+        }
+
         override fun doWork(): Result {
-            cacheDir.listFiles()?.iterator()?.forEach {
+            cache_dir!!.listFiles()?.iterator()?.forEach {
                 it.delete()
             }
-
 
             return Result.success()
         }
