@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL,
                 PeriodicWorkRequest.MIN_BACKOFF_MILLIS, TimeUnit.MILLISECONDS)
             .build()
-        workManager.enqueue(myPeriodicWorkRequest)
+        workManager.enqueueUniquePeriodicWork("I like trains", ExistingPeriodicWorkPolicy.KEEP, myPeriodicWorkRequest)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -67,6 +67,7 @@ class MainActivity : AppCompatActivity() {
             cacheDir.listFiles()?.iterator()?.forEach {
                 it.delete()
             }
+
 
             return Result.success()
         }
